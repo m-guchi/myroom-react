@@ -1,47 +1,26 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import axios from "axios"
+import { Container, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        textAlign:"center",
-        margin:"5rem auto",
-        padding:"1rem",
-        width:"90vw",
-        backgroundColor:"#cbddf5"
-    },
-    text: {
-        fontSize:"2rem"
+        padding: '1rem'
     }
 }));
 
-export default function TopDisplay () {
+export default function TopDisplay (props) {
     const classes = useStyles();
-    const [temperature, setTemperature] = useState();
-    const [humidity, setHumidity] = useState();
-
-    useEffect(() => {
-        fetchLastDHT();
-        // setTemperature(32.1)
-        // setHumidity(43.2)
-    },[])
-
-    const fetchLastDHT = () => {
-        axios.get("./api/dht/last")
-        .then(function(res) {
-            console.log(res.data)
-            setTemperature(res.data.temp)
-            setHumidity(res.data.humid)
-        })
-        .catch(function(err) {
-            console.error(err)
-        })
-    }
+    
+    const temperature = props.lastData.temp
+    const humidity = props.lastData.humid
+    const pressure = (props.lastData.press/100).toFixed(2)
 
     return(
-        <div className={classes.root}>
-            <div className={classes.text}>温度：{temperature}℃</div>
-            <div className={classes.text}>湿度：{humidity}％</div>
-        </div>
+        <Container className={classes.root} style={{ backgroundColor: '#cfe8fc' }} >
+            <Typography align='center' variant='body2'>{props.lastData.time}</Typography>
+            <Typography align='center' variant='h6'>温度：{temperature} (℃)</Typography>
+            <Typography align='center' variant='h6'>湿度：{humidity} (%)</Typography>
+            <Typography align='center' variant='h6'>気圧：{pressure} (hPa)</Typography>
+        </Container>
     )
 }

@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "お部屋管理",
+  "name": "お部屋を管理するアプリ",
   "icons": [
     {
       "src": "favicon.ico",
