@@ -22,6 +22,7 @@ export default function ChartSelect (props) {
                 >
                 <MenuItem value={72}>12時間</MenuItem>
                 <MenuItem value={144}>1日</MenuItem>
+                <MenuItem value={1008}>7日</MenuItem>
                 <MenuItem value={4320}>30日</MenuItem>
             </Select>
         </FormControl>
