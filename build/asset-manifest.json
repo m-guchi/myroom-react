@@ -1,20 +1,20 @@
 {
   "files": {
     "main.css": "/myroom/static/css/main.e8e5c3ac.chunk.css",
-    "main.js": "/myroom/static/js/main.c106b3c1.chunk.js",
-    "main.js.map": "/myroom/static/js/main.c106b3c1.chunk.js.map",
+    "main.js": "/myroom/static/js/main.a07f1c1f.chunk.js",
+    "main.js.map": "/myroom/static/js/main.a07f1c1f.chunk.js.map",
     "runtime-main.js": "/myroom/static/js/runtime-main.1b6b29bb.js",
     "runtime-main.js.map": "/myroom/static/js/runtime-main.1b6b29bb.js.map",
-    "static/js/2.c66b4b69.chunk.js": "/myroom/static/js/2.c66b4b69.chunk.js",
-    "static/js/2.c66b4b69.chunk.js.map": "/myroom/static/js/2.c66b4b69.chunk.js.map",
+    "static/js/2.e284cdb6.chunk.js": "/myroom/static/js/2.e284cdb6.chunk.js",
+    "static/js/2.e284cdb6.chunk.js.map": "/myroom/static/js/2.e284cdb6.chunk.js.map",
     "index.html": "/myroom/index.html",
     "static/css/main.e8e5c3ac.chunk.css.map": "/myroom/static/css/main.e8e5c3ac.chunk.css.map",
-    "static/js/2.c66b4b69.chunk.js.LICENSE.txt": "/myroom/static/js/2.c66b4b69.chunk.js.LICENSE.txt"
+    "static/js/2.e284cdb6.chunk.js.LICENSE.txt": "/myroom/static/js/2.e284cdb6.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.1b6b29bb.js",
-    "static/js/2.c66b4b69.chunk.js",
+    "static/js/2.e284cdb6.chunk.js",
     "static/css/main.e8e5c3ac.chunk.css",
-    "static/js/main.c106b3c1.chunk.js"
+    "static/js/main.a07f1c1f.chunk.js"
   ]
 }
