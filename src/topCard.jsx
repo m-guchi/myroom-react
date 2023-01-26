@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from "axios"
-import { Card, Typography, Grid, Alert, Divider, Button, Box } from '@mui/material';
+import { Card, CircularProgress, Typography, Grid, Alert, Divider, Button, Box } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 
@@ -20,82 +20,32 @@ const yesAvg = (date) => {
 
 export default function TopCard (props) {
 
-    const [data1d, setData1d] = useState(null)
-    const [dataLast, setDataLast] = useState(null)
-
-    useEffect(() => {
-        fetch1dData()
-        fetchLastData()
-        fetchWeatherData()
-    },[])
-
-
-    const fetch1dData = () => {
-        axios.get(process.env.REACT_APP_API_URL+"/dht?new=1d")
-        .then(function(res) {
-            if(res.data.ok){
-                setData1d(res.data.data)
-            }else{
-                console.error(res.data.error)
-            }
-        })
-        .catch(function(err) {
-            console.error(err)
-        })
-    }
-
-    const fetchLastData = () => {
-        axios.get(process.env.REACT_APP_API_URL+"/dht?new=last")
-        .then(function(res) {
-            if(res.data.ok){
-                setDataLast(res.data.data)
-            }else{
-                console.error(res.data.error)
-            }
-        })
-        .catch(function(err) {
-            console.error(err)
-        })
-    }
+    if (props.data1dAgo===null || props.datalast===null || props.weatherData===null) return(
+        <Card sx={{
+            width: "100%",
+            margin: "0 auto",
+        }}>
+            <Typography align='center' variant='h6' color="#3AABD2">最新情報</Typography>
+            <Box sx={{
+                textAlign: "center",
+                padding: "50px 0"
+            }}>
+                <CircularProgress />
+            </Box>
+        </Card>
+    )
 
 
-    const [isWeatherLoaded, setWeatherLoaded] = useState(false)
-    const [todayTelop, setTodayTelop] = useState(null)
-    const [todayMinTemp, setTodayMinTemp] = useState(null)
-    const [todayMaxTemp, setTodayMaxTemp] = useState(null)
-    const [TommorowTelop, setTommorowTelop] = useState(null)
-    const [TommorowMinTemp, setTommorowMinTemp] = useState(null)
-    const [TommorowMaxTemp, setTommorowMaxTemp] = useState(null)
+    const fc = props.weatherData
+    const todayTelop = fc[0]["telop"]??"-"
+    const todayMinTemp = fc[0]["temperature"]["min"]["celsius"]??"-"
+    const todayMaxTemp = fc[0]["temperature"]["max"]["celsius"]??"-"
+    const TommorowTelop = fc[1]["telop"]??"-"
+    const TommorowMinTemp = fc[1]["temperature"]["min"]["celsius"]??"-"
+    const TommorowMaxTemp = fc[1]["temperature"]["max"]["celsius"]??"-"
 
-    const fetchWeatherData = () => {
-        setWeatherLoaded(false)
-        axios.get("https://weather.tsukumijima.net/api/forecast/city/270000")
-        .then(res => {
-            const fc = res.data.forecasts
-            if(fc){
-                setTodayTelop(fc[0]["telop"]??"-")
-                setTodayMinTemp(fc[0]["temperature"]["min"]["celsius"]??"-")
-                setTodayMaxTemp(fc[0]["temperature"]["max"]["celsius"]??"-")
-                setTommorowTelop(fc[1]["telop"]??"-")
-                setTommorowMinTemp(fc[1]["temperature"]["min"]["celsius"]??"-")
-                setTommorowMaxTemp(fc[1]["temperature"]["max"]["celsius"]??"-")
-                setWeatherLoaded(true)
-            }else{
-                setTodayTelop("-")
-                setTodayMinTemp("-")
-                setTodayMaxTemp("-")
-                setTommorowTelop("-")
-                setTommorowMinTemp("-")
-                setTommorowMaxTemp("-")
-                setWeatherLoaded(true)
-            }
-        })
-    }
-
-    if (data1d===null || dataLast===null || !isWeatherLoaded) return null
-
-    const lastData = dataLast[0]
-    const [yesTemp, yesHumid, yesPress] = yesAvg(data1d)
+    const lastData = props.datalast[0]
+    const [yesTemp, yesHumid, yesPress] = yesAvg(props.data1dAgo)
 
     const tempDiff = (lastData["temperature"]-yesTemp).toFixed(2);
     const humidDiff = (lastData["humidity"]-yesHumid).toFixed(2);
@@ -218,7 +168,7 @@ export default function TopCard (props) {
                 <Button
                     variant="contained"
                     startIcon={<RefreshIcon />}
-                    onClick={() => window.location.reload()}
+                    onClick={props.handleLoad}
                 >画面更新</Button>
             </Box>
         </Card>

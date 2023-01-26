@@ -12,7 +12,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 
-import { Card, Typography } from '@mui/material';
+import { Box, Card, CircularProgress, Typography } from '@mui/material';
 
 ChartJS.register(
     CategoryScale,
@@ -52,33 +52,25 @@ const generateTimeLabel = (date) => {
 
 export default function ChartYear (props) {
 
-    const [data1y, setData1y] = useState(null)
 
-    useEffect(() => {
-        fetch1yData()
-    },[])
+    if(props.data===null) return(
+        <Card sx={{
+            width: "100%",
+            margin: "0 auto",
+        }}>
+            <Typography align='center' variant='h6'>過去1年間データ</Typography>
+            <Box sx={{
+                textAlign: "center",
+                padding: "50px 0"
+            }}>
+                <CircularProgress />
+            </Box>
+        </Card>
+    )
 
+    const label = generateTimeLabel(props.data)
 
-    const fetch1yData = () => {
-        axios.get(process.env.REACT_APP_API_URL+"/dht?range=1y")
-        .then(function(res) {
-            if(res.data.ok){
-                setData1y(res.data.data)
-            }else{
-                console.error(res.data.error)
-            }
-        })
-        .catch(function(err) {
-            console.error(err)
-        })
-    }
-
-
-    if(data1y===null) return null
-
-    const label = generateTimeLabel(data1y)
-
-    const dateTime1yArr = data1y.map(val => formatTime(val["date"]))
+    const dateTime1yArr = props.data.map(val => formatTime(val["date"]))
 
 
     const dataTemp = {
@@ -88,7 +80,7 @@ export default function ChartYear (props) {
                 data: label.map(val => {
                     const index = dateTime1yArr.indexOf(val)
                     if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1y[index]["temp_avg"]}
+                    return {x:val, y:props.data[index]["temp_avg"]}
                 }),
                 borderColor: "#1A73E8",
                 backgroundColor: "#1A73E8"
@@ -98,7 +90,7 @@ export default function ChartYear (props) {
                 data: label.map(val => {
                     const index = dateTime1yArr.indexOf(val)
                     if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1y[index]["temp_max"]}
+                    return {x:val, y:props.data[index]["temp_max"]}
                 }),
                 borderColor: "#BDD6F7",
                 backgroundColor: "#BDD6F7"
@@ -108,7 +100,7 @@ export default function ChartYear (props) {
                 data: label.map(val => {
                     const index = dateTime1yArr.indexOf(val)
                     if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1y[index]["temp_min"]}
+                    return {x:val, y:props.data[index]["temp_min"]}
                 }),
                 borderColor: "#BDD6F7",
                 backgroundColor: "#BDD6F7"
@@ -158,7 +150,7 @@ export default function ChartYear (props) {
                 data: label.map(val => {
                     const index = dateTime1yArr.indexOf(val)
                     if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1y[index]["humid_avg"]}
+                    return {x:val, y:props.data[index]["humid_avg"]}
                 }),
                 borderColor: "#CC7903",
                 backgroundColor: "#CC7903"
@@ -168,7 +160,7 @@ export default function ChartYear (props) {
                 data: label.map(val => {
                     const index = dateTime1yArr.indexOf(val)
                     if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1y[index]["humid_max"]}
+                    return {x:val, y:props.data[index]["humid_max"]}
                 }),
                 borderColor: "#EFD6B2",
                 backgroundColor: "#EFD6B2"
@@ -178,7 +170,7 @@ export default function ChartYear (props) {
                 data: label.map(val => {
                     const index = dateTime1yArr.indexOf(val)
                     if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1y[index]["humid_min"]}
+                    return {x:val, y:props.data[index]["humid_min"]}
                 }),
                 borderColor: "#EFD6B2",
                 backgroundColor: "#EFD6B2"
@@ -229,7 +221,7 @@ export default function ChartYear (props) {
                 data: label.map(val => {
                     const index = dateTime1yArr.indexOf(val)
                     if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1y[index]["press_avg"]/100}
+                    return {x:val, y:props.data[index]["press_avg"]/100}
                 }),
                 borderColor: "#30A650",
                 backgroundColor: "#30A650"
@@ -239,7 +231,7 @@ export default function ChartYear (props) {
                 data: label.map(val => {
                     const index = dateTime1yArr.indexOf(val)
                     if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1y[index]["press_max"]/100}
+                    return {x:val, y:props.data[index]["press_max"]/100}
                 }),
                 borderColor: "#B6E0C2",
                 backgroundColor: "#B6E0C2"
@@ -249,7 +241,7 @@ export default function ChartYear (props) {
                 data: label.map(val => {
                     const index = dateTime1yArr.indexOf(val)
                     if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1y[index]["press_min"]/100}
+                    return {x:val, y:props.data[index]["press_min"]/100}
                 }),
                 borderColor: "#B6E0C2",
                 backgroundColor: "#B6E0C2"

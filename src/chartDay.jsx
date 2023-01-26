@@ -31,27 +31,8 @@ const formatTime = (date) => {
     return hh+":"+mm;
 }
 
-
-const start2Time = (date1, date2) => {
-    const timeStamp1 = new Date(date1).getTime()
-    const timeStamp2 = new Date(date2).getTime()
-    const second1d = 1000*60*60*24
-    if(timeStamp1+second1d === timeStamp2) return timeStamp1
-    if(timeStamp1+second1d < timeStamp2) return timeStamp1
-    if(timeStamp1+second1d > timeStamp2) return timeStamp2-second1d
-}
-
-const generateTimeLabel = (date1, date2) => {
-    let startTimeStamp
-    if(date2.length<1 && date1.length<1){
-        startTimeStamp = 0
-    }else if(date2.length<1){
-        startTimeStamp = new Date(date1[0]["datetime"]).getTime()
-    }else if(date1.length<1){
-        startTimeStamp = new Date(date2[0]["datetime"]).getTime()
-    }else{
-        startTimeStamp = start2Time(date1[0]["datetime"], date2[0]["datetime"])
-    }
+const generateTimeLabel = () => {
+    const startTimeStamp = new Date('2020/01/01 00:00:00').getTime()
     const timeStampArr = [...Array(144)].map((_,i) => startTimeStamp+i*600*1000)
     const timeArr = timeStampArr.map(val => {
         const datetime = new Date(val)
@@ -65,18 +46,18 @@ const generateTimeLabel = (date1, date2) => {
 
 
 
-export default function ChartTime (props) {
+export default function ChartDay (props) {
 
 
-    const data1d = props.data1d
-    const data2d = props.data2d
+    const dataToday = props.dataToday
+    const data1w = props.data1w
 
-    if(data1d===null || data2d===null) return(
+    if(dataToday===null || data1w===null) return(
         <Card sx={{
             width: "100%",
             margin: "0 auto",
         }}>
-            <Typography align='center' variant='h6'>過去36時間データ</Typography>
+            <Typography align='center' variant='h6'>過去1週間データ</Typography>
             <Box sx={{
                 textAlign: "center",
                 padding: "50px 0"
@@ -87,35 +68,37 @@ export default function ChartTime (props) {
     )
 
 
-    const label = generateTimeLabel(data1d,data2d)
+    const label = generateTimeLabel()
+    const dateTimeToday = dataToday.map(val => formatTime(val["datetime"]))
 
-    const dateTime1dArr = data1d.map(val => formatTime(val["datetime"]))
-    const dateTime2dArr = data2d.map(val => formatTime(val["datetime"]))
 
+    const dataTempDatasets = []
+    dataTempDatasets.push({
+        label: "気温(今日)",
+        data: label.map(val => {
+            const index = dateTimeToday.indexOf(val)
+            if(index===-1) return {x:val, y:null}
+            return {x:val, y:dataToday[index]["temperature"]}
+        }),
+        borderColor: "#1A73E8",
+        backgroundColor: "#1A73E8"
+    })
+    Object.keys(data1w).forEach(key => {
+        const dateTimeLabel = data1w[key].map(val => formatTime(val["datetime"]))
+        dataTempDatasets.push({
+            label: "気温("+key+")",
+            data: label.map(val => {
+                const index = dateTimeLabel.indexOf(val)
+                if(index===-1) return {x:val, y:null}
+                return {x:val, y:data1w[key][index]["temperature"]}
+            }),
+            borderColor: "#BDD6F7",
+            backgroundColor: "#BDD6F7"
+        })
+    })
 
     const dataTemp = {
-        datasets: [
-            {
-                label: "気温",
-                data: label.map(val => {
-                    const index = dateTime1dArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1d[index]["temperature"]}
-                }),
-                borderColor: "#1A73E8",
-                backgroundColor: "#1A73E8"
-            },
-            {
-                label: "気温(昨日)",
-                data: label.map(val => {
-                    const index = dateTime2dArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data2d[index]["temperature"]}
-                }),
-                borderColor: "#BDD6F7",
-                backgroundColor: "#BDD6F7"
-            }
-        ]
+        datasets: dataTempDatasets
     }
     const optionTemp = {
         scales: {
@@ -153,29 +136,33 @@ export default function ChartTime (props) {
     }
 
 
+    const dataHumidDatasets = []
+    dataHumidDatasets.push({
+        label: "湿度(今日)",
+        data: label.map(val => {
+            const index = dateTimeToday.indexOf(val)
+            if(index===-1) return {x:val, y:null}
+            return {x:val, y:dataToday[index]["humidity"]}
+        }),
+        borderColor: "#CC7903",
+        backgroundColor: "#CC7903"
+    })
+    Object.keys(data1w).forEach(key => {
+        const dateTimeLabel = data1w[key].map(val => formatTime(val["datetime"]))
+        dataHumidDatasets.push({
+            label: "湿度("+key+")",
+            data: label.map(val => {
+                const index = dateTimeLabel.indexOf(val)
+                if(index===-1) return {x:val, y:null}
+                return {x:val, y:data1w[key][index]["humidity"]}
+            }),
+            borderColor: "#EFD6B2",
+            backgroundColor: "#EFD6B2"
+        })
+    })
+
     const dataHumid = {
-        datasets: [
-            {
-                label: "湿度",
-                data: label.map(val => {
-                    const index = dateTime1dArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1d[index]["humidity"]}
-                }),
-                borderColor: "#CC7903",
-                backgroundColor: "#CC7903"
-            },
-            {
-                label: "湿度(昨日)",
-                data: label.map(val => {
-                    const index = dateTime2dArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data2d[index]["humidity"]}
-                }),
-                borderColor: "#EFD6B2",
-                backgroundColor: "#EFD6B2"
-            }
-        ]
+        datasets: dataHumidDatasets
     }
     const optionHumid = {
         scales: {
@@ -213,30 +200,33 @@ export default function ChartTime (props) {
     }
 
 
+    const dataPressDatasets = []
+    dataPressDatasets.push({
+        label: "気圧(今日)",
+        data: label.map(val => {
+            const index = dateTimeToday.indexOf(val)
+            if(index===-1) return {x:val, y:null}
+            return {x:val, y:dataToday[index]["pressure"]/100}
+        }),
+        borderColor: "#30A650",
+        backgroundColor: "#30A650"
+    })
+    Object.keys(data1w).forEach(key => {
+        const dateTimeLabel = data1w[key].map(val => formatTime(val["datetime"]))
+        dataPressDatasets.push({
+            label: "気圧("+key+")",
+            data: label.map(val => {
+                const index = dateTimeLabel.indexOf(val)
+                if(index===-1) return {x:val, y:null}
+                return {x:val, y:data1w[key][index]["pressure"]/100}
+            }),
+            borderColor: "#B6E0C2",
+            backgroundColor: "#B6E0C2"
+        })
+    })
     
     const dataPress = {
-        datasets: [
-            {
-                label: "気圧",
-                data: label.map(val => {
-                    const index = dateTime1dArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1d[index]["pressure"]/100}
-                }),
-                borderColor: "#30A650",
-                backgroundColor: "#30A650"
-            },
-            {
-                label: "気圧(昨日)",
-                data: label.map(val => {
-                    const index = dateTime2dArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data2d[index]["pressure"]/100}
-                }),
-                borderColor: "#B6E0C2",
-                backgroundColor: "#B6E0C2"
-            }
-        ]
+        datasets: dataPressDatasets
     }
     const optionPress = {
         scales: {
@@ -282,7 +272,7 @@ export default function ChartTime (props) {
             // minWidth: "400px",
             margin: "0 auto"
         }}>
-            <Typography align='center' variant='h6'>過去36時間データ</Typography>
+            <Typography align='center' variant='h6'>過去1週間データ</Typography>
             <Line
                 height="40px"
                 width="100%"
