@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import axios from "axios"
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -11,6 +10,7 @@ import {
     Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { formatTime, generateTimeLabelfrom2Data } from './function';
 
 import { Box, Card, CircularProgress, Typography } from '@mui/material';
 
@@ -23,46 +23,6 @@ ChartJS.register(
     Tooltip,
     Legend
 );
-
-const formatTime = (date) => {
-    const datetime = new Date(date)
-    const hh = ('0' + datetime.getHours()).slice(-2)
-    const mm =('0' + datetime.getMinutes()).slice(-2)
-    return hh+":"+mm;
-}
-
-
-const start2Time = (date1, date2) => {
-    const timeStamp1 = new Date(date1).getTime()
-    const timeStamp2 = new Date(date2).getTime()
-    const second1d = 1000*60*60*24
-    if(timeStamp1+second1d === timeStamp2) return timeStamp1
-    if(timeStamp1+second1d < timeStamp2) return timeStamp1
-    if(timeStamp1+second1d > timeStamp2) return timeStamp2-second1d
-}
-
-const generateTimeLabel = (date1, date2) => {
-    let startTimeStamp
-    if(date2.length<1 && date1.length<1){
-        startTimeStamp = 0
-    }else if(date2.length<1){
-        startTimeStamp = new Date(date1[0]["datetime"]).getTime()
-    }else if(date1.length<1){
-        startTimeStamp = new Date(date2[0]["datetime"]).getTime()
-    }else{
-        startTimeStamp = start2Time(date1[0]["datetime"], date2[0]["datetime"])
-    }
-    const timeStampArr = [...Array(144)].map((_,i) => startTimeStamp+i*600*1000)
-    const timeArr = timeStampArr.map(val => {
-        const datetime = new Date(val)
-        const hh = ('0' + datetime.getHours()).slice(-2)
-        const mm =('0' + datetime.getMinutes()).slice(-2)
-        return hh+":"+mm;
-    })
-    return timeArr
-}
-
-
 
 
 export default function ChartTime (props) {
@@ -87,7 +47,7 @@ export default function ChartTime (props) {
     )
 
 
-    const label = generateTimeLabel(data1d,data2d)
+    const label = generateTimeLabelfrom2Data(data1d,data2d)
 
     const dateTime1dArr = data1d.map(val => formatTime(val["datetime"]))
     const dateTime2dArr = data2d.map(val => formatTime(val["datetime"]))
@@ -278,8 +238,6 @@ export default function ChartTime (props) {
     return(
         <Card sx={{
             width: "100%",
-            // maxWidth: "1000px",
-            // minWidth: "400px",
             margin: "0 auto"
         }}>
             <Typography align='center' variant='h6'>過去36時間データ</Typography>

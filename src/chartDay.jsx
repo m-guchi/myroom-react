@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import axios from "axios"
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -11,6 +10,7 @@ import {
     Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { formatTime, generateTimeLabelfrom0 } from './function';
 
 import { Box, Card, CircularProgress, Typography } from '@mui/material';
 
@@ -23,27 +23,6 @@ ChartJS.register(
     Tooltip,
     Legend
 );
-
-const formatTime = (date) => {
-    const datetime = new Date(date)
-    const hh = ('0' + datetime.getHours()).slice(-2)
-    const mm =('0' + datetime.getMinutes()).slice(-2)
-    return hh+":"+mm;
-}
-
-const generateTimeLabel = () => {
-    const startTimeStamp = new Date('2020/01/01 00:00:00').getTime()
-    const timeStampArr = [...Array(144)].map((_,i) => startTimeStamp+i*600*1000)
-    const timeArr = timeStampArr.map(val => {
-        const datetime = new Date(val)
-        const hh = ('0' + datetime.getHours()).slice(-2)
-        const mm =('0' + datetime.getMinutes()).slice(-2)
-        return hh+":"+mm;
-    })
-    return timeArr
-}
-
-
 
 
 export default function ChartDay (props) {
@@ -68,7 +47,7 @@ export default function ChartDay (props) {
     )
 
 
-    const label = generateTimeLabel()
+    const label = generateTimeLabelfrom0()
     const dateTimeToday = dataToday.map(val => formatTime(val["datetime"]))
 
 
@@ -268,8 +247,6 @@ export default function ChartDay (props) {
     return(
         <Card sx={{
             width: "100%",
-            // maxWidth: "1000px",
-            // minWidth: "400px",
             margin: "0 auto"
         }}>
             <Typography align='center' variant='h6'>過去1週間データ</Typography>

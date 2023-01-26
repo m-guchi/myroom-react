@@ -59,7 +59,7 @@ export default function App (props) {
     }
 
     const fetch1dAgoData = () => {
-        axios.get(process.env.REACT_APP_API_URL+"/dht?new=1d") //1日前データ
+        axios.get(process.env.REACT_APP_API_URL+"/dht_data?minute=1440&range=20")
         .then(function(res) {
             if(res.data.ok){
                 setData1dAgo(res.data.data)
@@ -72,7 +72,7 @@ export default function App (props) {
         })
     }
     const fetchLastData = () => {
-        axios.get(process.env.REACT_APP_API_URL+"/dht?new=last") //最新データ
+        axios.get(process.env.REACT_APP_API_URL+"/dht_data?last=1") //最新データ
         .then(function(res) {
             if(res.data.ok){
                 setDataLast(res.data.data)
@@ -92,7 +92,7 @@ export default function App (props) {
     }
 
     const fetchTodayData = () => {
-        axios.get(process.env.REACT_APP_API_URL+"/dht?range=today") //今日
+        axios.get(process.env.REACT_APP_API_URL+"/dht_time?std=00&begin=0&end=0") //今日
         .then(function(res) {
             if(res.data.ok){
                 setDataToday(res.data.data)
@@ -112,15 +112,12 @@ export default function App (props) {
         return yyyy+"-"+mm+"-"+dd;
     }
     const fetch1wData = () => {
-        axios.get(process.env.REACT_APP_API_URL+"/dht?range=1w") //1週間前～昨日
+        axios.get(process.env.REACT_APP_API_URL+"/dht_time?std=00&begin=7&end=1") //1週間前～昨日
         .then(function(res) {
             if(res.data.ok){
-                const data = res.data.data
                 const data1wObj = {}
-                data.forEach(val => {
-                    if(!(formatDay(val["datetime"]) in data1wObj)){
-                        data1wObj[formatDay(val["datetime"])] = Array()
-                    }
+                res.data.data.forEach(val => {
+                    if(!(formatDay(val["datetime"]) in data1wObj)){ data1wObj[formatDay(val["datetime"])] = Array() }
                     data1wObj[formatDay(val["datetime"])].push(val)
                 })
                 setData1w(data1wObj)
@@ -134,7 +131,7 @@ export default function App (props) {
     }
 
     const fetch1dData = () => { //12時間前～現在
-        axios.get(process.env.REACT_APP_API_URL+"/dht?range=1d")
+        axios.get(process.env.REACT_APP_API_URL+"/dht_time?std=half&begin=1&end=0")
         .then(function(res) {
             if(res.data.ok){
                 setData1d(res.data.data)
@@ -147,7 +144,7 @@ export default function App (props) {
         })
     }
     const fetch2dData = () => { //36時間前～12時間前
-        axios.get(process.env.REACT_APP_API_URL+"/dht?range=2d")
+        axios.get(process.env.REACT_APP_API_URL+"/dht_time?std=half&begin=2&end=1")
         .then(function(res) {
             if(res.data.ok){
                 setData2d(res.data.data)
@@ -160,7 +157,7 @@ export default function App (props) {
         })
     }
     const fetch2mData = () => { //2ヶ月
-        axios.get(process.env.REACT_APP_API_URL+"/dht?range=2m")
+        axios.get(process.env.REACT_APP_API_URL+"/dht_daily?std=half&begin=60")
         .then(function(res) {
             if(res.data.ok){
                 setData2m(res.data.data)
@@ -173,7 +170,7 @@ export default function App (props) {
         })
     }
     const fetch1yData = () => { //1年分
-        axios.get(process.env.REACT_APP_API_URL+"/dht?range=1y")
+        axios.get(process.env.REACT_APP_API_URL+"/dht_daily?std=half&begin=365")
         .then(function(res) {
             if(res.data.ok){
                 setData1y(res.data.data)

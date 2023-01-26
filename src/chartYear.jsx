@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import axios from "axios"
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -11,6 +10,7 @@ import {
     Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { formatDate, generateDateLabel } from './function';
 
 import { Box, Card, CircularProgress, Typography } from '@mui/material';
 
@@ -23,30 +23,6 @@ ChartJS.register(
     Tooltip,
     Legend
 );
-
-const formatTime = (date) => {
-    const datetime = new Date(date)
-    const YY = ('000' + datetime.getFullYear()).slice(-4)
-    const MM = ('0' + String(Number(datetime.getMonth())+1)).slice(-2)
-    const DD =('0' + datetime.getDate()).slice(-2)
-    return YY+"-"+MM+"-"+DD;
-}
-
-
-
-const generateTimeLabel = (date) => {
-    const startTimeStamp = (new Date(date[0]["date"])).getTime()
-    const timeStampArr = [...Array(366)].map((_,i) => startTimeStamp+i*24*60*60*1000)
-    const timeArr = timeStampArr.map(val => {
-        const datetime = new Date(val)
-        const YY = ('000' + datetime.getFullYear()).slice(-4)
-        const MM = ('0' + String(Number(datetime.getMonth())+1)).slice(-2)
-        const DD =('0' + datetime.getDate()).slice(-2)
-        return YY+"-"+MM+"-"+DD;
-    })
-    return timeArr
-}
-
 
 
 
@@ -68,9 +44,9 @@ export default function ChartYear (props) {
         </Card>
     )
 
-    const label = generateTimeLabel(props.data)
+    const label = generateDateLabel(props.data, 366)
 
-    const dateTime1yArr = props.data.map(val => formatTime(val["date"]))
+    const dateTime1yArr = props.data.map(val => formatDate(val["date"]))
 
 
     const dataTemp = {
