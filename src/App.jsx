@@ -187,7 +187,7 @@ export default function App (props) {
 
     return(
         <Grid container spacing={1} sx={{padding: 1}}>
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12}>
                 <Paper elevation={2}>
                     <TopCard
                         data1dAgo={data1dAgo}
