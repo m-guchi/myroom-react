@@ -10,6 +10,8 @@ import {
     Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { color } from './color';
+import { option } from './chartOptions';
 import { formatTime, generateTimeLabelfrom2Data } from './function';
 
 import { Box, Card, CircularProgress, Typography } from '@mui/material';
@@ -23,6 +25,35 @@ ChartJS.register(
     Tooltip,
     Legend
 );
+
+const dataSet = (labelName, xLabel, data1d, data2d, yLabelName, color, div=1) => {
+    const dateTime1d = data1d.map(val => formatTime(val["datetime"]))
+    const dateTime2d = data2d.map(val => formatTime(val["datetime"]))
+    return {
+        datasets: [
+            {
+                label: labelName,
+                data: xLabel.map(val => {
+                    const index = dateTime1d.indexOf(val)
+                    if(index===-1) return {x:val, y:null}
+                    return {x:val, y:data1d[index][yLabelName]/div}
+                }),
+                borderColor: color["bold"],
+                backgroundColor: color["bold"]
+            },
+            {
+                label: labelName+"(昨日)",
+                data: xLabel.map(val => {
+                    const index = dateTime2d.indexOf(val)
+                    if(index===-1) return {x:val, y:null}
+                    return {x:val, y:data2d[index][yLabelName]/div}
+                }),
+                borderColor: color["light"],
+                backgroundColor: color["light"]
+            }
+        ]
+    }
+}
 
 
 export default function ChartTime (props) {
@@ -49,190 +80,14 @@ export default function ChartTime (props) {
 
     const label = generateTimeLabelfrom2Data(data1d,data2d)
 
-    const dateTime1dArr = data1d.map(val => formatTime(val["datetime"]))
-    const dateTime2dArr = data2d.map(val => formatTime(val["datetime"]))
+    const dataTemp = dataSet("気温", label, data1d, data2d, "temperature", color["temp"])
+    const optionTemp = option("temp")
 
+    const dataHumid = dataSet("湿度", label, data1d, data2d, "humidity", color["humid"])
+    const optionHumid = option("humid")
 
-    const dataTemp = {
-        datasets: [
-            {
-                label: "気温",
-                data: label.map(val => {
-                    const index = dateTime1dArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1d[index]["temperature"]}
-                }),
-                borderColor: "#1A73E8",
-                backgroundColor: "#1A73E8"
-            },
-            {
-                label: "気温(昨日)",
-                data: label.map(val => {
-                    const index = dateTime2dArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data2d[index]["temperature"]}
-                }),
-                borderColor: "#BDD6F7",
-                backgroundColor: "#BDD6F7"
-            }
-        ]
-    }
-    const optionTemp = {
-        scales: {
-            y: {
-                suggestedMax: 27,
-                suggestedMin: 22,
-                title: {
-                    display: true,
-                    text: "（℃）",
-                    align: "end",
-                    padding: 2
-                }
-            },
-            x: {
-                ticks: {
-                    autoSkipPadding: 24,
-                    maxRotation: 0
-                }
-            }
-        },
-        plugins:{
-            legend: {
-                display: false
-            }
-        },
-        elements:{
-            line:{
-                tension: 0.8,
-                spanGaps: true
-            },
-            point: {
-                pointStyle: false,
-            }
-        }
-    }
-
-
-    const dataHumid = {
-        datasets: [
-            {
-                label: "湿度",
-                data: label.map(val => {
-                    const index = dateTime1dArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1d[index]["humidity"]}
-                }),
-                borderColor: "#CC7903",
-                backgroundColor: "#CC7903"
-            },
-            {
-                label: "湿度(昨日)",
-                data: label.map(val => {
-                    const index = dateTime2dArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data2d[index]["humidity"]}
-                }),
-                borderColor: "#EFD6B2",
-                backgroundColor: "#EFD6B2"
-            }
-        ]
-    }
-    const optionHumid = {
-        scales: {
-            y: {
-                suggestedMax: 50,
-                suggestedMin: 40,
-                title: {
-                    display: true,
-                    text: "（％）",
-                    align: "end",
-                    padding: 2
-                }
-            },
-            x: {
-                ticks: {
-                    autoSkipPadding: 24,
-                    maxRotation: 0
-                }
-            }
-        },
-        plugins:{
-            legend: {
-                display: false
-            }
-        },
-        elements:{
-            line:{
-                tension: 0.8,
-                spanGaps: true
-            },
-            point: {
-                pointStyle: false,
-            }
-        }
-    }
-
-
-    
-    const dataPress = {
-        datasets: [
-            {
-                label: "気圧",
-                data: label.map(val => {
-                    const index = dateTime1dArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data1d[index]["pressure"]/100}
-                }),
-                borderColor: "#30A650",
-                backgroundColor: "#30A650"
-            },
-            {
-                label: "気圧(昨日)",
-                data: label.map(val => {
-                    const index = dateTime2dArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:data2d[index]["pressure"]/100}
-                }),
-                borderColor: "#B6E0C2",
-                backgroundColor: "#B6E0C2"
-            }
-        ]
-    }
-    const optionPress = {
-        scales: {
-            y: {
-                suggestedMax: 1010,
-                suggestedMin: 1005,
-                title: {
-                    display: true,
-                    text: "（hPa）",
-                    align: "end",
-                    padding: 2
-                },
-            },
-            x: {
-                ticks: {
-                    autoSkipPadding: 24,
-                    maxRotation: 0
-                }
-            }
-        },
-        plugins:{
-            legend: {
-                display: false
-            }
-        },
-        elements:{
-            line:{
-                tension: 0.8,
-                spanGaps: true
-            },
-            point: {
-                pointStyle: false,
-            }
-        }
-    }
-
+    const dataPress = dataSet("気圧", label, data1d, data2d, "pressure", color["press"],100)
+    const optionPress = option("press")
 
 
     return(

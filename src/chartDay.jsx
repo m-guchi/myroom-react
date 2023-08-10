@@ -10,6 +10,8 @@ import {
     Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { color } from './color';
+import { option } from './chartOptions';
 import { formatTime, generateTimeLabelfrom0 } from './function';
 
 import { Box, Card, CircularProgress, Typography } from '@mui/material';
@@ -24,9 +26,34 @@ ChartJS.register(
     Legend
 );
 
+const todayDataSet = (labelName, data, xLabel, yLabelName, color, div=1) => {
+    const dateTime = data.map(val => formatTime(val["datetime"]))
+    return {
+        label: labelName,
+        data: xLabel.map(val => {
+            const index = dateTime.indexOf(val)
+            if(index===-1) return {x:val, y:null}
+            return {x:val, y:data[index][yLabelName]/div}
+        }),
+        borderColor: color,
+        backgroundColor: color
+    }
+}
+const weekDataSet = (key,labelName, data, xLabel, yLabelName, color, div=1) => {
+    const dateTimeLabel = data[key].map(val => formatTime(val["datetime"]))
+    return {
+        label: labelName+"("+key+")",
+        data: xLabel.map(val => {
+            const index = dateTimeLabel.indexOf(val)
+            if(index===-1) return {x:val, y:null}
+            return {x:val, y:data[key][index][yLabelName]/div}
+        }),
+        borderColor: color,
+        backgroundColor: color
+    }
+}
 
 export default function ChartDay (props) {
-
 
     const dataToday = props.dataToday
     const data1w = props.data1w
@@ -48,199 +75,34 @@ export default function ChartDay (props) {
 
 
     const label = generateTimeLabelfrom0()
-    const dateTimeToday = dataToday.map(val => formatTime(val["datetime"]))
 
 
     const dataTempDatasets = []
-    dataTempDatasets.push({
-        label: "気温(今日)",
-        data: label.map(val => {
-            const index = dateTimeToday.indexOf(val)
-            if(index===-1) return {x:val, y:null}
-            return {x:val, y:dataToday[index]["temperature"]}
-        }),
-        borderColor: "#1A73E8",
-        backgroundColor: "#1A73E8"
-    })
+    dataTempDatasets.push(todayDataSet("気温(今日)",dataToday,label,"temperature",color["temp"]["bold"]))
     Object.keys(data1w).forEach(key => {
-        const dateTimeLabel = data1w[key].map(val => formatTime(val["datetime"]))
-        dataTempDatasets.push({
-            label: "気温("+key+")",
-            data: label.map(val => {
-                const index = dateTimeLabel.indexOf(val)
-                if(index===-1) return {x:val, y:null}
-                return {x:val, y:data1w[key][index]["temperature"]}
-            }),
-            borderColor: "#BDD6F7",
-            backgroundColor: "#BDD6F7"
-        })
+        dataTempDatasets.push(weekDataSet(key,"気温",data1w,label,"temperature",color["temp"]["light"]))
     })
-
-    const dataTemp = {
-        datasets: dataTempDatasets
-    }
-    const optionTemp = {
-        scales: {
-            y: {
-                suggestedMax: 27,
-                suggestedMin: 22,
-                title: {
-                    display: true,
-                    text: "（℃）",
-                    align: "end",
-                    padding: 2
-                }
-            },
-            x: {
-                ticks: {
-                    autoSkipPadding: 24,
-                    maxRotation: 0
-                }
-            }
-        },
-        plugins:{
-            legend: {
-                display: false
-            }
-        },
-        elements:{
-            line:{
-                tension: 0.8,
-                spanGaps: true
-            },
-            point: {
-                pointStyle: false,
-            }
-        }
-    }
+    const dataTemp = { datasets: dataTempDatasets }
+    const optionTemp = option("temp")
 
 
     const dataHumidDatasets = []
-    dataHumidDatasets.push({
-        label: "湿度(今日)",
-        data: label.map(val => {
-            const index = dateTimeToday.indexOf(val)
-            if(index===-1) return {x:val, y:null}
-            return {x:val, y:dataToday[index]["humidity"]}
-        }),
-        borderColor: "#CC7903",
-        backgroundColor: "#CC7903"
-    })
+    dataHumidDatasets.push(todayDataSet("湿度(今日)",dataToday,label,"humidity",color["humid"]["bold"]))
     Object.keys(data1w).forEach(key => {
-        const dateTimeLabel = data1w[key].map(val => formatTime(val["datetime"]))
-        dataHumidDatasets.push({
-            label: "湿度("+key+")",
-            data: label.map(val => {
-                const index = dateTimeLabel.indexOf(val)
-                if(index===-1) return {x:val, y:null}
-                return {x:val, y:data1w[key][index]["humidity"]}
-            }),
-            borderColor: "#EFD6B2",
-            backgroundColor: "#EFD6B2"
-        })
+        dataHumidDatasets.push(weekDataSet(key,"湿度",data1w,label,"humidity",color["humid"]["light"]))
     })
-
-    const dataHumid = {
-        datasets: dataHumidDatasets
-    }
-    const optionHumid = {
-        scales: {
-            y: {
-                suggestedMax: 50,
-                suggestedMin: 40,
-                title: {
-                    display: true,
-                    text: "（％）",
-                    align: "end",
-                    padding: 2
-                }
-            },
-            x: {
-                ticks: {
-                    autoSkipPadding: 24,
-                    maxRotation: 0
-                }
-            }
-        },
-        plugins:{
-            legend: {
-                display: false
-            }
-        },
-        elements:{
-            line:{
-                tension: 0.8,
-                spanGaps: true
-            },
-            point: {
-                pointStyle: false,
-            }
-        }
-    }
+    const dataHumid = { datasets: dataHumidDatasets }
+    const optionHumid = option("humid")
 
 
     const dataPressDatasets = []
-    dataPressDatasets.push({
-        label: "気圧(今日)",
-        data: label.map(val => {
-            const index = dateTimeToday.indexOf(val)
-            if(index===-1) return {x:val, y:null}
-            return {x:val, y:dataToday[index]["pressure"]/100}
-        }),
-        borderColor: "#30A650",
-        backgroundColor: "#30A650"
-    })
+    dataPressDatasets.push(todayDataSet("気圧(今日)",dataToday,label,"pressure",color["press"]["bold"],100))
     Object.keys(data1w).forEach(key => {
-        const dateTimeLabel = data1w[key].map(val => formatTime(val["datetime"]))
-        dataPressDatasets.push({
-            label: "気圧("+key+")",
-            data: label.map(val => {
-                const index = dateTimeLabel.indexOf(val)
-                if(index===-1) return {x:val, y:null}
-                return {x:val, y:data1w[key][index]["pressure"]/100}
-            }),
-            borderColor: "#B6E0C2",
-            backgroundColor: "#B6E0C2"
-        })
+        dataPressDatasets.push(weekDataSet(key,"気圧",data1w,label,"pressure",color["press"]["light"],100))
     })
-    
-    const dataPress = {
-        datasets: dataPressDatasets
-    }
-    const optionPress = {
-        scales: {
-            y: {
-                suggestedMax: 1010,
-                suggestedMin: 1005,
-                title: {
-                    display: true,
-                    text: "（hPa）",
-                    align: "end",
-                    padding: 2
-                },
-            },
-            x: {
-                ticks: {
-                    autoSkipPadding: 24,
-                    maxRotation: 0
-                }
-            }
-        },
-        plugins:{
-            legend: {
-                display: false
-            }
-        },
-        elements:{
-            line:{
-                tension: 0.8,
-                spanGaps: true
-            },
-            point: {
-                pointStyle: false,
-            }
-        }
-    }
+
+    const dataPress = { datasets: dataPressDatasets }
+    const optionPress = option("press")
 
 
 

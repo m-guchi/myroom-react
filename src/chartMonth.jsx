@@ -10,6 +10,8 @@ import {
     Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { color } from './color';
+import { option } from './chartOptions';
 import { formatDate, generateDateLabel } from './function';
 
 import { Box, Card, Typography, CircularProgress } from '@mui/material';
@@ -23,6 +25,44 @@ ChartJS.register(
     Tooltip,
     Legend
 );
+
+const dataSet = (labelName, label, data, indexPrefix, color, div=1) => {
+    const dateTime = data.map(val => formatDate(val["date"]))
+    return {
+        datasets: [
+            {
+                label: labelName+"(平均)",
+                data: label.map(val => {
+                    const index = dateTime.indexOf(val)
+                    if(index===-1) return {x:val, y:null}
+                    return {x:val, y:data[index][indexPrefix+"_avg"]/div}
+                }),
+                borderColor: color["bold"],
+                backgroundColor: color["bold"]
+            },
+            {
+                label: labelName+"(最高)",
+                data: label.map(val => {
+                    const index = dateTime.indexOf(val)
+                    if(index===-1) return {x:val, y:null}
+                    return {x:val, y:data[index][indexPrefix+"_max"]/div}
+                }),
+                borderColor: color["light"],
+                backgroundColor: color["light"]
+            },
+            {
+                label: labelName+"(最低)",
+                data: label.map(val => {
+                    const index = dateTime.indexOf(val)
+                    if(index===-1) return {x:val, y:null}
+                    return {x:val, y:data[index][indexPrefix+"_min"]/div}
+                }),
+                borderColor: color["light"],
+                backgroundColor: color["light"]
+            }
+        ]
+    }
+}
 
 
 export default function ChartMonth (props) {
@@ -44,218 +84,14 @@ export default function ChartMonth (props) {
 
     const label = generateDateLabel(props.data, 90)
 
-    const dateTime1yArr = props.data.map(val => formatDate(val["date"]))
+    const dataTemp = dataSet("気温", label, props.data, "temp", color["temp"])
+    const optionTemp = option("temp")
 
+    const dataHumid = dataSet("湿度", label, props.data, "humid", color["humid"])
+    const optionHumid = option("humid")
 
-    const dataTemp = {
-        datasets: [
-            {
-                label: "気温(平均)",
-                data: label.map(val => {
-                    const index = dateTime1yArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:props.data[index]["temp_avg"]}
-                }),
-                borderColor: "#1A73E8",
-                backgroundColor: "#1A73E8"
-            },
-            {
-                label: "気温(最高)",
-                data: label.map(val => {
-                    const index = dateTime1yArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:props.data[index]["temp_max"]}
-                }),
-                borderColor: "#BDD6F7",
-                backgroundColor: "#BDD6F7"
-            },
-            {
-                label: "気温(最低)",
-                data: label.map(val => {
-                    const index = dateTime1yArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:props.data[index]["temp_min"]}
-                }),
-                borderColor: "#BDD6F7",
-                backgroundColor: "#BDD6F7"
-            }
-        ]
-    }
-    const optionTemp = {
-        scales: {
-            y: {
-                suggestedMax: 25,
-                suggestedMin: 25,
-                title: {
-                    display: true,
-                    text: "（℃）",
-                    align: "end",
-                    padding: 2
-                }
-            },
-            x: {
-                ticks: {
-                    autoSkipPadding: 30,
-                    maxRotation: 0
-                }
-            }
-        },
-        plugins:{
-            legend: {
-                display: false
-            }
-        },
-        elements:{
-            line:{
-                tension: 0.8,
-                spanGaps: true
-            },
-            point: {
-                pointStyle: false,
-            }
-        }
-    }
-
-
-    const dataHumid = {
-        datasets: [
-            {
-                label: "湿度(平均)",
-                data: label.map(val => {
-                    const index = dateTime1yArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:props.data[index]["humid_avg"]}
-                }),
-                borderColor: "#CC7903",
-                backgroundColor: "#CC7903"
-            },
-            {
-                label: "湿度(最高)",
-                data: label.map(val => {
-                    const index = dateTime1yArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:props.data[index]["humid_max"]}
-                }),
-                borderColor: "#EFD6B2",
-                backgroundColor: "#EFD6B2"
-            },
-            {
-                label: "湿度(最低)",
-                data: label.map(val => {
-                    const index = dateTime1yArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:props.data[index]["humid_min"]}
-                }),
-                borderColor: "#EFD6B2",
-                backgroundColor: "#EFD6B2"
-            }
-        ]
-    }
-    const optionHumid = {
-        scales: {
-            y: {
-                suggestedMax: 50,
-                suggestedMin: 50,
-                title: {
-                    display: true,
-                    text: "（％）",
-                    align: "end",
-                    padding: 2
-                }
-            },
-            x: {
-                ticks: {
-                    autoSkipPadding: 24,
-                    maxRotation: 0
-                }
-            }
-        },
-        plugins:{
-            legend: {
-                display: false
-            }
-        },
-        elements:{
-            line:{
-                tension: 0.8,
-                spanGaps: true
-            },
-            point: {
-                pointStyle: false,
-            }
-        }
-    }
-
-
-    
-    const dataPress = {
-        datasets: [
-            {
-                label: "気圧(平均)",
-                data: label.map(val => {
-                    const index = dateTime1yArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:props.data[index]["press_avg"]/100}
-                }),
-                borderColor: "#30A650",
-                backgroundColor: "#30A650"
-            },
-            {
-                label: "気圧(最高)",
-                data: label.map(val => {
-                    const index = dateTime1yArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:props.data[index]["press_max"]/100}
-                }),
-                borderColor: "#B6E0C2",
-                backgroundColor: "#B6E0C2"
-            },
-            {
-                label: "気圧(最低)",
-                data: label.map(val => {
-                    const index = dateTime1yArr.indexOf(val)
-                    if(index===-1) return {x:val, y:null}
-                    return {x:val, y:props.data[index]["press_min"]/100}
-                }),
-                borderColor: "#B6E0C2",
-                backgroundColor: "#B6E0C2"
-            }
-        ]
-    }
-    const optionPress = {
-        scales: {
-            y: {
-                suggestedMax: 1000,
-                suggestedMin: 1000,
-                title: {
-                    display: true,
-                    text: "（hPa）",
-                    align: "end",
-                    padding: 2
-                },
-            },
-            x: {
-                ticks: {
-                    autoSkipPadding: 24,
-                    maxRotation: 0
-                }
-            }
-        },
-        plugins:{
-            legend: {
-                display: false
-            }
-        },
-        elements:{
-            line:{
-                tension: 0.8,
-                spanGaps: true
-            },
-            point: {
-                pointStyle: false,
-            }
-        }
-    }
+    const dataPress = dataSet("気圧", label, props.data, "press", color["press"],100)
+    const optionPress = option("press")
 
 
 
